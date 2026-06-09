@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nube de Palabras</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -106,6 +107,11 @@
 
 <h1>☁ Nube de Palabras</h1>
 
+<div id="qr-container" style="text-align:center; margin-bottom:1.5rem;">
+  <p style="color:#aaa; font-size:0.85rem; margin-bottom:0.5rem;">Escanea para participar</p>
+  <div id="qrcode" style="display:inline-block; background:#fff; padding:10px; border-radius:8px;"></div>
+</div>
+
 <div class="input-area">
   <input type="text" id="wordInput" placeholder="Escribe una palabra..." maxlength="30" />
   <button onclick="sendWord()">Enviar</button>
@@ -204,6 +210,15 @@
   document.getElementById('wordInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') sendWord();
   });
+
+  new QRCode(document.getElementById('qrcode'), {
+    text: window.location.href,
+    width: 140,
+    height: 140,
+    colorDark: '#000',
+    colorLight: '#fff',
+  });
 </script>
 </body>
 </html>
+  
