@@ -10,7 +10,7 @@
 
   body {
     font-family: 'Segoe UI', sans-serif;
-    background: #1a1a2e;
+    background: url('./background.jpg') center center / cover no-repeat fixed;
     color: #fff;
     min-height: 100vh;
     display: flex;
@@ -18,6 +18,16 @@
     align-items: center;
     padding: 2rem 1rem;
   }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 0;
+  }
+
+  body > * { position: relative; z-index: 1; }
 
   h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; color: #e0e0e0; }
 
@@ -221,4 +231,5 @@
 </script>
 </body>
 </html>
-  
+
+
