@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nube de Palabras</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #1a1a2e;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+
+  h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; color: #e0e0e0; }
+
+  .input-area {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    border: 2px solid #444;
+    background: #16213e;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus { border-color: #7c6ff7; }
+
+  button {
+    padding: 0.65rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    background: #7c6ff7;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  button:hover { background: #6457e8; }
+
+  #cloud {
+    width: 100%;
+    max-width: 860px;
+    min-height: 340px;
+    background: #16213e;
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem 1.2rem;
+    position: relative;
+  }
+
+  .empty-msg { color: #555; font-size: 1rem; }
+
+  .word {
+    transition: all 0.4s ease;
+    cursor: default;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .word:hover { transform: scale(1.1); }
+
+  .controls { margin-top: 1.2rem; }
+
+  .btn-reset {
+    background: transparent;
+    border: 2px solid #444;
+    color: #aaa;
+    font-size: 0.85rem;
+    padding: 0.45rem 0.9rem;
+  }
+
+  .btn-reset:hover { border-color: #e05c77; color: #e05c77; background: transparent; }
+
+  #status {
+    margin-top: 0.8rem;
+    font-size: 0.78rem;
+    color: #555;
+  }
+
+  #status.connected { color: #3dd6c8; }
+</style>
+</head>
+<body>
+
+<h1>☁ Nube de Palabras</h1>
+
+<div class="input-area">
+  <input type="text" id="wordInput" placeholder="Escribe una palabra..." maxlength="30" />
+  <button onclick="sendWord()">Enviar</button>
+</div>
+
+<div id="cloud">
+  <span class="empty-msg">Esperando palabras...</span>
+</div>
+
+<div class="controls">
+  <button class="btn-reset" onclick="resetCloud()">Limpiar todo</button>
+</div>
+
+<p id="status">Conectando...</p>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const COLORS = [
+    '#7c6ff7','#e05c77','#3dd6c8','#f5a623','#5bc7fa',
+    '#a8e063','#ff6b6b','#ffd166','#06d6a0','#ef476f'
+  ];
+
+  const colorMap = {};
+  let colorIndex = 0;
+
+  function getColor(word) {
+    if (!colorMap[word]) {
+      colorMap[word] = COLORS[colorIndex % COLORS.length];
+      colorIndex++;
+    }
+    return colorMap[word];
+  }
+
+  const socket = io();
+
+  socket.on('connect', () => {
+    const s = document.getElementById('status');
+    s.textContent = 'Conectado ✓';
+    s.className = 'connected';
+  });
+
+  socket.on('disconnect', () => {
+    const s = document.getElementById('status');
+    s.textContent = 'Desconectado';
+    s.className = '';
+  });
+
+  socket.on('update', (words) => {
+    renderCloud(words);
+  });
+
+  function sendWord() {
+    const input = document.getElementById('wordInput');
+    const word = input.value.trim();
+    if (!word) return;
+    socket.emit('word', word);
+    input.value = '';
+    input.focus();
+  }
+
+  function resetCloud() {
+    if (confirm('¿Limpiar todas las palabras para todos?')) {
+      socket.emit('reset');
+    }
+  }
+
+  function renderCloud(words) {
+    const cloud = document.getElementById('cloud');
+    const entries = Object.entries(words);
+
+    if (entries.length === 0) {
+      cloud.innerHTML = '<span class="empty-msg">Esperando palabras...</span>';
+      return;
+    }
+
+    const max = Math.max(...entries.map(e => e[1]));
+    const min = Math.min(...entries.map(e => e[1]));
+
+    cloud.innerHTML = '';
+    entries.sort((a, b) => b[1] - a[1]).forEach(([word, count]) => {
+      const span = document.createElement('span');
+      span.className = 'word';
+      span.textContent = word;
+
+      const ratio = max === min ? 0.5 : (count - min) / (max - min);
+      span.style.fontSize = (14 + Math.round(ratio * 52)) + 'px';
+      span.style.fontWeight = count === max ? 800 : count > min ? 600 : 400;
+      span.style.color = getColor(word);
+      span.style.opacity = 0.6 + ratio * 0.4;
+      span.title = `"${word}" — ${count} vez${count !== 1 ? 'es' : ''}`;
+
+      cloud.appendChild(span);
+    });
+  }
+
+  document.getElementById('wordInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendWord();
+  });
+</script>
+</body>
+</html>
