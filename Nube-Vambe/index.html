@@ -3,233 +3,235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nube de Palabras</title>
+<title>Vambe</title>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: url('./background.jpg') center center / cover no-repeat fixed;
-    color: #fff;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 1rem;
-  }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: url('./background.jpg') center center / cover no-repeat fixed;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 0;
-  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 0;
+  }
 
-  body > * { position: relative; z-index: 1; }
+  body > * { position: relative; z-index: 1; }
 
-  h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; color: #e0e0e0; }
+  h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; color: #E0E0E0; }
 
-  .input-area {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-    width: 100%;
-    max-width: 480px;
-  }
+  .input-area {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 480px;
+  }
 
-  input[type="text"] {
-    flex: 1;
-    padding: 0.65rem 1rem;
-    border-radius: 8px;
-    border: 2px solid #444;
-    background: #16213e;
-    color: #fff;
-    font-size: 1rem;
-    outline: none;
-    transition: border-color 0.2s;
-  }
+  input[type="text"] {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    border: 2px solid #444;
+    background: #16213E;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
 
-  input[type="text"]:focus { border-color: #7c6ff7; }
+  input[type="text"]:focus { border-color: #7C6FF7; }
 
-  button {
-    padding: 0.65rem 1.2rem;
-    border-radius: 8px;
-    border: none;
-    background: #7c6ff7;
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
+  button {
+    padding: 0.65rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    background: #7C6FF7;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
 
-  button:hover { background: #6457e8; }
+  button:hover { background: #6457E8; }
 
-  #cloud {
-    width: 100%;
-    max-width: 860px;
-    min-height: 340px;
-    background: #16213e;
-    border-radius: 16px;
-    padding: 2rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem 1.2rem;
-    position: relative;
-  }
+  #cloud {
+    width: 100%;
+    max-width: 1000px;
+    min-height: 500px;
+    background: rgba(22, 33, 62, 0.35);
+    backdrop-filter: blur(2px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem 1.2rem;
+    position: relative;
+  }
 
-  .empty-msg { color: #555; font-size: 1rem; }
+  .empty-msg { color: #999; font-size: 1rem; }
 
-  .word {
-    transition: all 0.4s ease;
-    cursor: default;
-    line-height: 1;
-    user-select: none;
-  }
+  .word {
+    transition: all 0.4s ease;
+    cursor: default;
+    line-height: 1;
+    user-select: none;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+  }
 
-  .word:hover { transform: scale(1.1); }
+  .word:hover { transform: scale(1.1); }
 
-  .controls { margin-top: 1.2rem; }
+  .controls { margin-top: 1.2rem; }
 
-  .btn-reset {
-    background: transparent;
-    border: 2px solid #444;
-    color: #aaa;
-    font-size: 0.85rem;
-    padding: 0.45rem 0.9rem;
-  }
+  .btn-reset {
+    background: transparent;
+    border: 2px solid #444;
+    color: #aaa;
+    font-size: 0.85rem;
+    padding: 0.45rem 0.9rem;
+  }
 
-  .btn-reset:hover { border-color: #e05c77; color: #e05c77; background: transparent; }
+  .btn-reset:hover { border-color: #E05C77; color: #E05C77; background: transparent; }
 
-  #status {
-    margin-top: 0.8rem;
-    font-size: 0.78rem;
-    color: #555;
-  }
+  #status {
+    margin-top: 0.8rem;
+    font-size: 0.78rem;
+    color: #999;
+  }
 
-  #status.connected { color: #3dd6c8; }
+  #status.connected { color: #3DD6C8; }
 </style>
 </head>
 <body>
 
-<h1>☁ Nube de Palabras</h1>
+<h1>Vambe</h1>
 
-<div id="qr-container" style="text-align:center; margin-bottom:1.5rem;">
-  <p style="color:#aaa; font-size:0.85rem; margin-bottom:0.5rem;">Escanea para participar</p>
-  <div id="qrcode" style="display:inline-block; background:#fff; padding:10px; border-radius:8px;"></div>
+<div id="qr-container" style="text-align:center; margin-bottom:1rem;">
+  <p style="color:#ccc; font-size:0.8rem; margin-bottom:0.4rem;">Escanea para participar</p>
+  <div id="qrcode" style="display:inline-block; background:#fff; padding:8px; border-radius:8px;"></div>
 </div>
 
 <div class="input-area">
-  <input type="text" id="wordInput" placeholder="Escribe una palabra..." maxlength="30" />
-  <button onclick="sendWord()">Enviar</button>
+  <input type="text" id="wordInput" placeholder="Escribe una palabra o frase..." maxlength="40" />
+  <button onclick="sendWord()">Enviar</button>
 </div>
 
 <div id="cloud">
-  <span class="empty-msg">Esperando palabras...</span>
+  <span class="empty-msg">Esperando palabras...</span>
 </div>
 
 <div class="controls">
-  <button class="btn-reset" onclick="resetCloud()">Limpiar todo</button>
+  <button class="btn-reset" onclick="resetCloud()">Limpiar todo</button>
 </div>
 
 <p id="status">Conectando...</p>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  const COLORS = [
-    '#7c6ff7','#e05c77','#3dd6c8','#f5a623','#5bc7fa',
-    '#a8e063','#ff6b6b','#ffd166','#06d6a0','#ef476f'
-  ];
+  const COLORS = [
+    '#7C6FF7','#E05C77','#3DD6C8','#F5A623','#5BC7FA',
+    '#A8E063','#FF6B6B','#FFD166','#06D6A0','#EF476F'
+  ];
 
-  const colorMap = {};
-  let colorIndex = 0;
+  const colorMap = {};
+  let colorIndex = 0;
 
-  function getColor(word) {
-    if (!colorMap[word]) {
-      colorMap[word] = COLORS[colorIndex % COLORS.length];
-      colorIndex++;
-    }
-    return colorMap[word];
-  }
+  function getColor(word) {
+    if (!colorMap[word]) {
+      colorMap[word] = COLORS[colorIndex % COLORS.length];
+      colorIndex++;
+    }
+    return colorMap[word];
+  }
 
-  const socket = io();
+  const socket = io();
 
-  socket.on('connect', () => {
-    const s = document.getElementById('status');
-    s.textContent = 'Conectado ✓';
-    s.className = 'connected';
-  });
+  socket.on('connect', () => {
+    const s = document.getElementById('status');
+    s.textContent = 'Conectado ✓';
+    s.className = 'connected';
+  });
 
-  socket.on('disconnect', () => {
-    const s = document.getElementById('status');
-    s.textContent = 'Desconectado';
-    s.className = '';
-  });
+  socket.on('disconnect', () => {
+    const s = document.getElementById('status');
+    s.textContent = 'Desconectado';
+    s.className = '';
+  });
 
-  socket.on('update', (words) => {
-    renderCloud(words);
-  });
+  socket.on('update', (words) => {
+    renderCloud(words);
+  });
 
-  function sendWord() {
-    const input = document.getElementById('wordInput');
-    const word = input.value.trim();
-    if (!word) return;
-    socket.emit('word', word);
-    input.value = '';
-    input.focus();
-  }
+  function sendWord() {
+    const input = document.getElementById('wordInput');
+    const word = input.value.trim();
+    if (!word) return;
+    socket.emit('word', word);
+    input.value = '';
+    input.focus();
+  }
 
-  function resetCloud() {
-    if (confirm('¿Limpiar todas las palabras para todos?')) {
-      socket.emit('reset');
-    }
-  }
+  function resetCloud() {
+    if (confirm('¿Limpiar todas las palabras para todos?')) {
+      socket.emit('reset');
+    }
+  }
 
-  function renderCloud(words) {
-    const cloud = document.getElementById('cloud');
-    const entries = Object.entries(words);
+  function renderCloud(words) {
+    const cloud = document.getElementById('cloud');
+    const entries = Object.entries(words);
 
-    if (entries.length === 0) {
-      cloud.innerHTML = '<span class="empty-msg">Esperando palabras...</span>';
-      return;
-    }
+    if (entries.length === 0) {
+      cloud.innerHTML = '<span class="empty-msg">Esperando palabras...</span>';
+      return;
+    }
 
-    const max = Math.max(...entries.map(e => e[1]));
-    const min = Math.min(...entries.map(e => e[1]));
+    const max = Math.max(...entries.map(e => e[1]));
+    const min = Math.min(...entries.map(e => e[1]));
 
-    cloud.innerHTML = '';
-    entries.sort((a, b) => b[1] - a[1]).forEach(([word, count]) => {
-      const span = document.createElement('span');
-      span.className = 'word';
-      span.textContent = word;
+    cloud.innerHTML = '';
+    entries.sort((a, b) => b[1] - a[1]).forEach(([word, count]) => {
+      const span = document.createElement('span');
+      span.className = 'word';
+      span.textContent = word;
 
-      const ratio = max === min ? 0.5 : (count - min) / (max - min);
-      span.style.fontSize = (14 + Math.round(ratio * 52)) + 'px';
-      span.style.fontWeight = count === max ? 800 : count > min ? 600 : 400;
-      span.style.color = getColor(word);
-      span.style.opacity = 0.6 + ratio * 0.4;
-      span.title = `"${word}" — ${count} vez${count !== 1 ? 'es' : ''}`;
+      const ratio = max === min ? 0.5 : (count - min) / (max - min);
+      span.style.fontSize = (16 + Math.round(ratio * 64)) + 'px';
+      span.style.fontWeight = count === max ? 800 : count > min ? 600 : 400;
+      span.style.color = getColor(word);
+      span.style.opacity = 0.6 + ratio * 0.4;
+      span.title = `"${word}" — ${count} vez${count !== 1 ? 'es' : ''}`;
 
-      cloud.appendChild(span);
-    });
-  }
+      cloud.appendChild(span);
+    });
+  }
 
-  document.getElementById('wordInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') sendWord();
-  });
+  document.getElementById('wordInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendWord();
+  });
 
-  new QRCode(document.getElementById('qrcode'), {
-    text: window.location.href,
-    width: 140,
-    height: 140,
-    colorDark: '#000',
-    colorLight: '#fff',
-  });
+  new QRCode(document.getElementById('qrcode'), {
+    text: window.location.href,
+    width: 90,
+    height: 90,
+    colorDark: '#000',
+    colorLight: '#fff',
+  });
 </script>
 </body>
 </html>
-
 
