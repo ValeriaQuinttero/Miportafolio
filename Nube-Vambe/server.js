@@ -15,7 +15,7 @@ io.on('connection', (socket) => {
   socket.emit('update', words);
 
   socket.on('word', (raw) => {
-    const word = String(raw).trim().toLowerCase().replace(/[^a-záéíóúüñà-ÿ0-9]/gi, '').slice(0, 30);
+    const word = String(raw).trim().replace(/\s+/g, ' ').slice(0, 30);
     if (!word) return;
     words[word] = (words[word] || 0) + 1;
     io.emit('update', words);
